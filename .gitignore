@@ -5,7 +5,6 @@ __pycache__/
 
 # Dependencies
 vendor/
-node_modules/
 
 # Logs and temp files
 *.log
@@ -19,18 +18,4 @@ node_modules/
 # Editors
 .vscode/
 .idea/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-*.coverage
-
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
 ```
