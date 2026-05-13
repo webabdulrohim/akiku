@@ -1,139 +1,119 @@
 <?php
-/**
- * Core Stone Indonesia - Categories Page
- * Daftar semua kategori
- */
-require_once 'config/config.php';
+session_start();
+require 'config/database.php';
 
-$categories = $pdo->query("SELECT c.*, COUNT(p.id) as product_count 
-                           FROM categories c 
-                           LEFT JOIN products p ON c.id = p.category_id AND p.status = 'active'
-                           GROUP BY c.id 
-                           ORDER BY c.created_at DESC")->fetchAll();
-
-$pageTitle = 'Kategori Produk';
+// Ambil semua kategori
+$stmt = $conn->prepare("SELECT c.*, COUNT(p.id) as product_count 
+                        FROM categories c 
+                        LEFT JOIN products p ON c.id = p.category_id AND p.status = 'active'
+                        GROUP BY c.id 
+                        ORDER BY c.name ASC");
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?> - Core Stone Indonesia</title>
+    <title>Kategori - Core Stone Indonesia</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .categories-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1f2937;
+        }
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .category-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .category-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+            transform: translateY(-2px);
+        }
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .category-info {
+            flex: 1;
+        }
+        .category-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+        .category-count {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        @media (max-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <div class="container">
-                <span>📍 Jakarta, Indonesia</span>
-                <span>📞 0812-1493-2916 | ✉️ info@corestone.id</span>
-            </div>
-        </div>
-        <div class="header-main">
-            <div class="container">
-                <a href="index.php" class="logo">
-                    <div class="logo-icon">💎</div>
-                    <span>Core Stone Indonesia</span>
-                </a>
-                <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
-                <ul class="nav-menu" id="navMenu">
-                    <li><a href="index.php">Beranda</a></li>
-                    <li><a href="products.php">Produk</a></li>
-                    <li><a href="categories.php" class="active">Kategori</a></li>
-                    <li><a href="about.php">Tentang</a></li>
-                    <li><a href="contact.php">Kontak</a></li>
-                </ul>
-                <div class="header-actions">
-                    <?php if (isLoggedIn()): ?>
-                        <a href="cart.php" class="btn btn-outline">🛒 Keranjang (<?= isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0 ?>)</a>
-                        <a href="account.php" class="btn btn-primary">Akun Saya</a>
-                    <?php else: ?>
-                        <a href="login.php" class="btn btn-outline">Login</a>
-                        <a href="register.php" class="btn btn-primary">Daftar</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </header>
+    <?php include 'includes/header.php'; ?>
 
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container">
-            <h1><?= $pageTitle ?></h1>
-            <p>Jelajahi berbagai kategori batu akik premium kami</p>
+    <div class="categories-container">
+        <h1 class="page-title">Kategori Produk</h1>
+        
+        <div class="categories-grid">
+            <?php if ($result->num_rows > 0): ?>
+                <?php while($category = $result->fetch_assoc()): ?>
+                    <a href="category.php?id=<?= $category['id'] ?>" class="category-card">
+                        <div class="category-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="category-info">
+                            <div class="category-name"><?= htmlspecialchars($category['name']) ?></div>
+                            <div class="category-count"><?= $category['product_count'] ?> Produk</div>
+                        </div>
+                    </a>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #6b7280;">
+                    <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Belum ada kategori.</p>
+                </div>
+            <?php endif; ?>
         </div>
-    </section>
+    </div>
 
-    <!-- Categories Section -->
-    <section class="categories-section">
-        <div class="container">
-            <div class="category-grid-large">
-                <?php foreach ($categories as $category): ?>
-                <a href="category.php?slug=<?= $category['slug'] ?>" class="category-card-large">
-                    <div class="category-icon-large">💎</div>
-                    <h3><?= htmlspecialchars($category['name']) ?></h3>
-                    <p><?= htmlspecialchars($category['description']) ?></p>
-                    <span class="product-count"><?= $category['product_count'] ?> Produk</span>
-                </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="logo">
-                        <div class="logo-icon">💎</div>
-                        <span>Core Stone Indonesia</span>
-                    </div>
-                    <p>Marketplace batu akik terpercaya di Indonesia.</p>
-                </div>
-                <div class="footer-links">
-                    <h4>Navigasi</h4>
-                    <ul>
-                        <li><a href="index.php">Beranda</a></li>
-                        <li><a href="products.php">Produk</a></li>
-                        <li><a href="categories.php">Kategori</a></li>
-                        <li><a href="about.php">Tentang Kami</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Akun</h4>
-                    <ul>
-                        <li><a href="login.php">Login</a></li>
-                        <li><a href="register.php">Daftar</a></li>
-                        <li><a href="cart.php">Keranjang</a></li>
-                        <li><a href="orders.php">Pesanan Saya</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Kontak</h4>
-                    <ul>
-                        <li>📞 0812-1493-2916</li>
-                        <li>✉️ info@corestone.id</li>
-                        <li>📍 Jakarta, Indonesia</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <?= date('Y') ?> Core Stone Indonesia. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- WhatsApp Float Button -->
-    <a href="https://wa.me/6281214932916?text=Halo%20saya%20butuh%20bantuan%20memilih%20kategori" 
-       class="whatsapp-float" 
-       target="_blank" 
-       rel="noopener noreferrer">
-        💬
-    </a>
-
-    <script src="assets/js/main.js"></script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
