@@ -224,10 +224,27 @@
             </ul>
             
             <div class="nav-icons">
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="my-account.php" class="nav-icon" title="Akun Saya">👤</a>
+                <?php if (isset($_SESSION['user_id'])): 
+                    // Ambil data user untuk menampilkan nama atau foto
+                    $user_id = $_SESSION['user_id'];
+                    $stmt = $conn->prepare("SELECT name, email, profile_photo FROM users WHERE id = ?");
+                    $stmt->bind_param("i", $user_id);
+                    $stmt->execute();
+                    $user_data = $stmt->get_result()->fetch_assoc();
+                    
+                    $avatar_url = '';
+                    if (!empty($user_data['profile_photo']) && file_exists('assets/images/profiles/' . $user_data['profile_photo'])) {
+                        $avatar_url = 'assets/images/profiles/' . $user_data['profile_photo'];
+                    } else {
+                        $avatar_url = 'https://ui-avatars.com/api/?name=' . urlencode($user_data['name'] ?? 'User') . '&background=10b981&color=fff&size=40';
+                    }
+                ?>
+                    <a href="my-account.php" class="nav-icon" title="Akun Saya" style="display: flex; align-items: center; gap: 8px;">
+                        <img src="<?php echo $avatar_url; ?>" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white;">
+                    </a>
                 <?php else: ?>
                     <a href="login.php" class="nav-icon" title="Login">🔐</a>
+                    <a href="register.php" class="nav-icon" title="Daftar" style="font-size: 0.9rem; padding: 6px 12px; background: rgba(255,255,255,0.2); border-radius: 20px;">Daftar</a>
                 <?php endif; ?>
                 
                 <a href="cart.php" class="nav-icon" title="Keranjang">

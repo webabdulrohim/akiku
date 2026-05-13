@@ -248,9 +248,15 @@ $orders_result = $orders_stmt->get_result();
 
     <div class="account-container">
         <div class="account-header">
-            <img src="<?= $user['photo'] ? $user['photo'] : 'assets/images/default-avatar.png' ?>" 
-                 alt="Profile" class="account-avatar"
-                 onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($user['name']) ?>&background=10b981&color=fff&size=200'">
+            <?php 
+            $avatar_url = '';
+            if (!empty($user['photo']) && file_exists($user['photo'])) {
+                $avatar_url = $user['photo'];
+            } else {
+                $avatar_url = 'https://ui-avatars.com/api/?name=' . urlencode($user['name']) . '&background=10b981&color=fff&size=200';
+            }
+            ?>
+            <img src="<?= $avatar_url ?>" alt="Profile" class="account-avatar">
             <div>
                 <h1 style="margin: 0; font-size: 1.5rem;">Halo, <?= htmlspecialchars($user['name']) ?>!</h1>
                 <p style="margin: 0.5rem 0 0; opacity: 0.9;"><?= htmlspecialchars($user['email']) ?></p>

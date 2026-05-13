@@ -39,30 +39,19 @@ $result = $stmt->get_result();
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1rem 1.5rem;
             text-decoration: none;
             color: inherit;
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 1rem;
         }
         .category-card:hover {
             border-color: #10b981;
             box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
             transform: translateY(-2px);
-        }
-        .category-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-            flex-shrink: 0;
         }
         .category-info {
             flex: 1;
@@ -96,13 +85,11 @@ $result = $stmt->get_result();
             <?php if ($result->num_rows > 0): ?>
                 <?php while($category = $result->fetch_assoc()): ?>
                     <a href="category.php?id=<?= $category['id'] ?>" class="category-card">
-                        <div class="category-icon">
-                            <i class="fas fa-gem"></i>
-                        </div>
                         <div class="category-info">
                             <div class="category-name"><?= htmlspecialchars($category['name']) ?></div>
                             <div class="category-count"><?= $category['product_count'] ?> Produk</div>
                         </div>
+                        <i class="fas fa-chevron-right" style="color: #9ca3af; font-size: 0.9rem;"></i>
                     </a>
                 <?php endwhile; ?>
             <?php else: ?>
