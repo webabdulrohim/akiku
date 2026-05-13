@@ -37,21 +37,18 @@ $total_customers = $count_stmt->fetch()['count'];
 $total_pages = ceil($total_customers / $per_page);
 
 // Get customers with order stats
-$params_for_data = $params;
-$params_for_data[] = $per_page;
-$params_for_data[] = $offset;
-
-$stmt = $pdo->prepare("SELECT u.*, 
-                              COUNT(o.id) as total_orders,
-                              COALESCE(SUM(o.total_amount), 0) as total_spent,
-                              MAX(o.created_at) as last_order_date
-                       FROM users u 
-                       LEFT JOIN orders o ON u.id = o.user_id 
-                       WHERE u.role = 'user' $where_sql
-                       GROUP BY u.id
-                       ORDER BY total_spent DESC 
-                       LIMIT ? OFFSET ?");
-$stmt->execute($params_for_data);
+$sql = "SELECT u.*,
+               COUNT(o.id) as total_orders,
+               COALESCE(SUM(o.total_amount), 0) as total_spent,
+               MAX(o.created_at) as last_order_date
+        FROM users u
+        LEFT JOIN orders o ON u.id = o.user_id
+        WHERE u.role = 'user' $where_sql
+        GROUP BY u.id
+        ORDER BY total_spent DESC
+        LIMIT " . (int)$per_page . " OFFSET " . (int)$offset;
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $customers = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>

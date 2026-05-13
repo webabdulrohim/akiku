@@ -43,9 +43,8 @@ $total_users = $count_stmt->fetch()['count'];
 $total_pages = ceil($total_users / $per_page);
 
 // Get users
-$params[] = $per_page;
-$params[] = $offset;
-$stmt = $pdo->prepare("SELECT * FROM users WHERE role = 'user' $where_sql ORDER BY created_at DESC LIMIT ? OFFSET ?");
+$sql = "SELECT * FROM users WHERE role = 'user' $where_sql ORDER BY created_at DESC LIMIT " . (int)$per_page . " OFFSET " . (int)$offset;
+$stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $users = $stmt->fetchAll();
 ?>
