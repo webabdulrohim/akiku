@@ -54,15 +54,20 @@ $count_stmt->execute($params);
 $total_orders = $count_stmt->fetch()['count'];
 $total_pages = ceil($total_orders / $per_page);
 
-// Get orders
-$params[] = $per_page;
-$params[] = $offset;
-$stmt = $pdo->prepare("SELECT o.*, u.name as user_name, u.email as user_email 
-                       FROM orders o 
-                       JOIN users u ON o.user_id = u.id 
-                       $where_sql
-                       ORDER BY o.created_at DESC 
-                       LIMIT ? OFFSET ?");
+// Get orders - using integer parameters directly in SQL for LIMIT and OFFSET
+// Note: We don't add $per_page and $offset to $params since we're embedding them directly in SQL
+
+// Prepare statement without binding LIMIT/OFFSET as strings
+$sql = "SELECT o.*, u.name as user_name, u.email as user_email 
+        FROM orders o 
+        JOIN users u ON o.user_id = u.id 
+        $where_sql
+        ORDER BY o.created_at DESC";
+
+// Add limit and offset directly to SQL (safe since they are integers)
+$sql .= " LIMIT " . (int)$per_page . " OFFSET " . (int)$offset;
+
+$stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $orders = $stmt->fetchAll();
 ?>

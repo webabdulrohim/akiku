@@ -12,9 +12,22 @@ require_once 'config/database.php';
 $user_id = $_SESSION['user_id'];
 
 // Ambil semua pesanan user
-$query = "SELECT o.*, os.name as status_name, os.color 
+$query = "SELECT o.*, 
+          CASE 
+              WHEN o.status = 'pending' THEN 'Pending'
+              WHEN o.status = 'paid' THEN 'Paid'
+              WHEN o.status = 'completed' THEN 'Completed'
+              WHEN o.status = 'cancelled' THEN 'Cancelled'
+              ELSE 'Unknown'
+          END as status_name,
+          CASE 
+              WHEN o.status = 'pending' THEN '#fef3c7'
+              WHEN o.status = 'paid' THEN '#dbeafe'
+              WHEN o.status = 'completed' THEN '#d1fae5'
+              WHEN o.status = 'cancelled' THEN '#fee2e2'
+              ELSE '#e5e7eb'
+          END as color
           FROM orders o 
-          LEFT JOIN order_statuses os ON o.status = os.id 
           WHERE o.user_id = ? 
           ORDER BY o.created_at DESC";
 $stmt = $conn->prepare($query);
