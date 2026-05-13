@@ -1,46 +1,32 @@
 ```
-# SQL files
-*.sql
-
-# PHP files
-*.php~
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Environment
+# Environment and config files
 .env
 .env.local
 .env.*
 
-# Editors
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Backup files
+*.bak
+*.backup
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE specific files
 .vscode/
 .idea/
 
-# Dependencies
-node_modules/
-vendor/
+# PHP specific
+*.php~
+.php_cs.cache
 
-# Build artifacts
-dist/
-build/
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# Python artifacts
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Compressed files
+# Compression files
 *.zip
 *.gz
 *.tar
@@ -63,20 +49,4 @@ __pycache__/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Cache directories
-.cache/
-.mypy_cache/
-.pytest_cache/
-.gradle/
-target/
 ```
