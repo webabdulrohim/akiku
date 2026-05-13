@@ -4,8 +4,8 @@
 __pycache__/
 
 # Dependencies
-venv/
-.venv/
+vendor/
+node_modules/
 
 # Logs and temp files
 *.log
@@ -21,17 +21,12 @@ venv/
 .vscode/
 .idea/
 
-# OS generated files
+# OS specific
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-*.coverage
-
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
+# Backup and swap files
+*~
+*.bak
+*.backup
 ```
