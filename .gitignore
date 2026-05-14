@@ -1,32 +1,57 @@
 ```
-# Environment and config files
+# Environment variables
 .env
 .env.local
-.env.*
+*.env.*
 
 # Logs
 *.log
 
 # Temporary files
 *.tmp
-
-# Backup files
-*.bak
-*.backup
+*.swp
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# IDE specific files
-.vscode/
-.idea/
+# Dependencies
+node_modules/
+vendor/
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.eggs/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage/
+htmlcov/
 
 # PHP specific
 *.php~
-.php_cs.cache
+*.php.bak
 
-# Compression files
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Compressed files
 *.zip
 *.gz
 *.tar

@@ -327,7 +327,7 @@ $orders_result = $orders_stmt->get_result();
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <div style="font-weight: 500;">Total: <span style="color: #10b981; font-size: 1.25rem;">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></span></div>
+                                <div style="font-weight: 500;">Total: <span style="color: #10b981; font-size: 1.25rem;">Rp <?= number_format($order['grand_total'], 0, ',', '.') ?></span></div>
                                 <div style="font-size: 0.875rem; color: #6b7280;">Metode: <?= $order['payment_method'] ?></div>
                             </div>
                             <a href="order-detail.php?id=<?= $order['id'] ?>" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Lihat Detail</a>

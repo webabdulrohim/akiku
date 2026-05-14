@@ -408,7 +408,7 @@ textarea {
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($order['order_number']); ?></strong></td>
                                 <td><?php echo date('d M Y, H:i', strtotime($order['created_at'])); ?></td>
-                                <td>Rp <?php echo number_format($order['total_amount'], 0, ',', '.'); ?></td>
+                                <td>Rp <?php echo number_format($order['grand_total'], 0, ',', '.'); ?></td>
                                 <td>
                                     <span class="status-badge" style="background: <?php echo htmlspecialchars($order['color'] ?? '#e5e7eb'); ?>; color: <?php echo $order['color'] == '#fef3c7' ? '#92400e' : '#1f2937'; ?>">
                                         <?php echo htmlspecialchars($order['status_name'] ?? 'Pending'); ?>

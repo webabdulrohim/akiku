@@ -363,7 +363,7 @@ $orders = $stmt->fetchAll();
                                     <div style="font-weight: 600;"><?= htmlspecialchars($order['user_name']) ?></div>
                                     <div style="font-size: 12px; color: #6b7280;"><?= htmlspecialchars($order['user_email']) ?></div>
                                 </td>
-                                <td><?= formatRupiah($order['total_amount']) ?></td>
+                                <td><?= formatRupiah($order['grand_total']) ?></td>
                                 <td>
                                     <span class="status-badge status-<?= $order['status'] ?>">
                                         <?= ucfirst($order['status']) ?>

@@ -332,7 +332,7 @@ include 'includes/header.php';
         <div class="summary-section">
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>Rp <?php echo number_format($order['total_amount'] - ($order['shipping_cost'] ?? 0), 0, ',', '.'); ?></span>
+                <span>Rp <?php echo number_format($order['grand_total'] - ($order['shipping_cost'] ?? 0), 0, ',', '.'); ?></span>
             </div>
             <?php if ($order['shipping_cost']): ?>
             <div class="summary-row">
@@ -342,7 +342,7 @@ include 'includes/header.php';
             <?php endif; ?>
             <div class="summary-row">
                 <span>Total Pembayaran</span>
-                <span>Rp <?php echo number_format($order['total_amount'], 0, ',', '.'); ?></span>
+                <span>Rp <?php echo number_format($order['grand_total'], 0, ',', '.'); ?></span>
             </div>
         </div>
         

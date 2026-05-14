@@ -29,7 +29,7 @@ $stmt = $pdo->query("SELECT COUNT(*) as count FROM orders WHERE status = 'pendin
 $stats['pending_orders'] = $stmt->fetch()['count'];
 
 // Total revenue
-$stmt = $pdo->query("SELECT SUM(total_amount) as total FROM orders WHERE status IN ('paid', 'completed')");
+$stmt = $pdo->query("SELECT SUM(grand_total) as total FROM orders WHERE status IN ('paid', 'completed')");
 $stats['total_revenue'] = $stmt->fetch()['total'] ?? 0;
 
 // Recent orders
@@ -42,7 +42,7 @@ $recent_orders = $pdo->query("SELECT o.*, u.name as user_name, u.email as user_e
 // Sales data for chart (last 7 days)
 $sales_data = $pdo->query("SELECT DATE(created_at) as date, 
                                   COUNT(*) as order_count,
-                                  COALESCE(SUM(total_amount), 0) as total_sales
+                                  COALESCE(SUM(grand_total), 0) as total_sales
                            FROM orders 
                            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                            GROUP BY DATE(created_at)
@@ -385,7 +385,7 @@ $sales_data = $pdo->query("SELECT DATE(created_at) as date,
                                 <div style="font-weight: 600;"><?= htmlspecialchars($order['user_name']) ?></div>
                                 <div style="font-size: 12px; color: #6b7280;"><?= htmlspecialchars($order['user_email']) ?></div>
                             </td>
-                            <td><?= formatRupiah($order['total_amount']) ?></td>
+                            <td><?= formatRupiah($order['grand_total']) ?></td>
                             <td>
                                 <span class="status-badge status-<?= $order['status'] ?>">
                                     <?= ucfirst($order['status']) ?>

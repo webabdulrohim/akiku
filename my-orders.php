@@ -283,7 +283,7 @@ include 'includes/header.php';
                         
                         <div class="order-total">
                             <div class="total-label">Total Pembayaran</div>
-                            <div class="total-amount">Rp <?php echo number_format($order['total_amount'], 0, ',', '.'); ?></div>
+                            <div class="total-amount">Rp <?php echo number_format($order['grand_total'], 0, ',', '.'); ?></div>
                         </div>
                     </div>
                     

@@ -39,7 +39,7 @@ $total_pages = ceil($total_customers / $per_page);
 // Get customers with order stats
 $sql = "SELECT u.*,
                COUNT(o.id) as total_orders,
-               COALESCE(SUM(o.total_amount), 0) as total_spent,
+               COALESCE(SUM(o.grand_total), 0) as total_spent,
                MAX(o.created_at) as last_order_date
         FROM users u
         LEFT JOIN orders o ON u.id = o.user_id
