@@ -52,12 +52,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkout'])) {
     try {
         $pdo->beginTransaction();
         
-        // Insert order
-        $orderStmt = $pdo->prepare("INSERT INTO orders (order_code, user_id, full_name, email, phone, address, city, province, postal_code, subtotal, shipping_cost, total, payment_method, shipping_method, status) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+        // Insert order dengan semua kolom yang diperlukan
+        $orderStmt = $pdo->prepare("INSERT INTO orders (
+            order_code, user_id, name, full_name, email, phone, 
+            address, city, province, subdistrict, postal_code, 
+            courier, shipping_method, service, weight, shipping_cost,
+            subtotal, total, grand_total, 
+            payment_method, status, customer_notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)");
+        
+        // Set default values for missing data
+        $subdistrict = ''; // Kecamatan
+        $courier = ''; // Kurir
+        $service = ''; // Layanan
+        $weight = 0; // Berat total
+        $customerNotes = $_POST['notes'] ?? '';
+        
         $orderStmt->execute([
-            $orderCode, $userId, $fullName, $email, $phone, $address, $city, $province, $postalCode,
-            $cartTotal, $shippingCost, $grandTotal, $paymentMethod, $shippingMethod
+            $orderCode, $userId, $fullName, $fullName, $email, $phone, 
+            $address, $city, $province, $subdistrict, $postalCode,
+            $courier, $shippingMethod, $service, $weight, $shippingCost,
+            $cartTotal, $grandTotal, $grandTotal,
+            $paymentMethod, $customerNotes
         ]);
         
         $orderId = $pdo->lastInsertId();

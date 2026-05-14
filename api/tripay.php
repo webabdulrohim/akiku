@@ -25,7 +25,7 @@ class TripayPayment {
     
     public function createTransaction($orderData) {
         $merchantCode = $this->merchantCode;
-        $amount = $orderData['total_amount'];
+        $amount = $orderData['grand_total'];
         $orderNumber = $orderData['order_number'];
         $customerName = $orderData['customer_name'];
         $customerEmail = $orderData['customer_email'] ?? '';

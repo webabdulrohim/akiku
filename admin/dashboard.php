@@ -29,7 +29,7 @@ $stmt = $pdo->query("SELECT COUNT(*) as count FROM orders WHERE status = 'pendin
 $stats['pending_orders'] = $stmt->fetch()['count'];
 
 // Total revenue
-$stmt = $pdo->query("SELECT SUM(total_amount) as total FROM orders WHERE status IN ('paid', 'completed')");
+$stmt = $pdo->query("SELECT SUM(grand_total) as total FROM orders WHERE status IN ('paid', 'completed')");
 $stats['total_revenue'] = $stmt->fetch()['total'] ?? 0;
 
 // Recent orders
@@ -38,6 +38,16 @@ $recent_orders = $pdo->query("SELECT o.*, u.name as user_name, u.email as user_e
                               JOIN users u ON o.user_id = u.id 
                               ORDER BY o.created_at DESC LIMIT 10")
                           ->fetchAll();
+
+// Sales data for chart (last 7 days)
+$sales_data = $pdo->query("SELECT DATE(created_at) as date, 
+                                  COUNT(*) as order_count,
+                                  COALESCE(SUM(grand_total), 0) as total_sales
+                           FROM orders 
+                           WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                           GROUP BY DATE(created_at)
+                           ORDER BY date ASC")
+                       ->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -158,6 +168,27 @@ $recent_orders = $pdo->query("SELECT o.*, u.name as user_name, u.email as user_e
         }
         .stat-icon.success {
             background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+        }
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .chart-header h3 {
+            font-size: 18px;
+            color: #1f2937;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
         }
         .stat-value {
             font-size: 28px;
@@ -319,6 +350,16 @@ $recent_orders = $pdo->query("SELECT o.*, u.name as user_name, u.email as user_e
                 </div>
             </div>
 
+            <!-- Sales Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Grafik Penjualan (7 Hari Terakhir)</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
             <!-- Recent Orders Table -->
             <div class="data-table">
                 <div class="table-header">
@@ -344,7 +385,7 @@ $recent_orders = $pdo->query("SELECT o.*, u.name as user_name, u.email as user_e
                                 <div style="font-weight: 600;"><?= htmlspecialchars($order['user_name']) ?></div>
                                 <div style="font-size: 12px; color: #6b7280;"><?= htmlspecialchars($order['user_email']) ?></div>
                             </td>
-                            <td><?= formatRupiah($order['total_amount']) ?></td>
+                            <td><?= formatRupiah($order['grand_total']) ?></td>
                             <td>
                                 <span class="status-badge status-<?= $order['status'] ?>">
                                     <?= ucfirst($order['status']) ?>
@@ -361,5 +402,76 @@ $recent_orders = $pdo->query("SELECT o.*, u.name as user_name, u.email as user_e
             </div>
         </main>
     </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Sales chart data
+        const salesData = <?= json_encode($sales_data) ?>;
+        
+        // Prepare chart data
+        const labels = salesData.map(item => {
+            const date = new Date(item.date);
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+        });
+        const orderCounts = salesData.map(item => item.order_count);
+        const totalSales = salesData.map(item => item.total_sales);
+        
+        // Create chart
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Penjualan (Rp)',
+                    data: totalSales,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

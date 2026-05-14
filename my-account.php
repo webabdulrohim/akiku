@@ -81,9 +81,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Ambil riwayat pesanan
-$orders_query = "SELECT o.*, os.name as status_name, os.color 
+$orders_query = "SELECT o.*, 
+                 CASE 
+                     WHEN o.status = 'pending' THEN 'Pending'
+                     WHEN o.status = 'paid' THEN 'Paid'
+                     WHEN o.status = 'completed' THEN 'Completed'
+                     WHEN o.status = 'cancelled' THEN 'Cancelled'
+                     ELSE 'Unknown'
+                 END as status_name,
+                 CASE 
+                     WHEN o.status = 'pending' THEN '#fef3c7'
+                     WHEN o.status = 'paid' THEN '#dbeafe'
+                     WHEN o.status = 'completed' THEN '#d1fae5'
+                     WHEN o.status = 'cancelled' THEN '#fee2e2'
+                     ELSE '#e5e7eb'
+                 END as color
                  FROM orders o 
-                 LEFT JOIN order_statuses os ON o.status = os.id 
                  WHERE o.user_id = ? 
                  ORDER BY o.created_at DESC";
 $orders_stmt = $conn->prepare($orders_query);
@@ -395,7 +408,7 @@ textarea {
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($order['order_number']); ?></strong></td>
                                 <td><?php echo date('d M Y, H:i', strtotime($order['created_at'])); ?></td>
-                                <td>Rp <?php echo number_format($order['total_amount'], 0, ',', '.'); ?></td>
+                                <td>Rp <?php echo number_format($order['grand_total'], 0, ',', '.'); ?></td>
                                 <td>
                                     <span class="status-badge" style="background: <?php echo htmlspecialchars($order['color'] ?? '#e5e7eb'); ?>; color: <?php echo $order['color'] == '#fef3c7' ? '#92400e' : '#1f2937'; ?>">
                                         <?php echo htmlspecialchars($order['status_name'] ?? 'Pending'); ?>
